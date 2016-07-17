@@ -6,6 +6,7 @@
 package solitaire;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
@@ -27,7 +28,6 @@ public class Solitaire {
     private static final List<List<Card>>   tab = new ArrayList<>(),
                                             found = new ArrayList<>();
     
-
     /**
      * @param args the command line arguments
      */
@@ -66,7 +66,7 @@ public class Solitaire {
                             for (int i = 0; i < 3; i++) {
                                 inputNum[i] = Integer.parseInt(input[i + 1]);
                             }
-//                            moveCardStack(inputNum[0], inputNum[1], inputNum[2]);
+                            moveCardStack(inputNum[0], inputNum[1], inputNum[2]);
                         }
                         break;
                     default:
@@ -207,175 +207,159 @@ public class Solitaire {
     }
     
     private static boolean gameWon() {
-        //Code game win condition
+        //TODO: Code game win condition
         return false;
     }
-//    
-//    private static void moveCardStack(int c1, int n, int c2) {
-//        Card[] cardStack;
-//        //Read the card stack
-//        cardStack = readCardStack(c1, n);
-//        
-//        //Was the card stack read successfully?
-//        if (cardStack != null) {
-//            //Write the card stack
-//            writeCardStack(cardStack, c2);
-//        }
-//    }
-//
-//    private static Card[] readCardStack(int c1, int n) {
-//        Card[] cardStack;
-//        switch (c1) {
-//            case 1:
-//            case 2:
-//            case 3:
-//            case 4:
-//            case 5:
-//            case 6:
-//            case 7:
-//                cardStack = readCardStackFromTableau(n, c1);
-//                break;
-//            case 8:
-//                cardStack = new Card[1];
-//                cardStack[0] = readCardFromWaste();
-//                if (cardStack[0] == null) {
-//                    cardStack = null;
-//                }
-//                break;
-//            case 9:
-//            case 10:
-//            case 11:
-//            case 12:
-//                cardStack = new Card[1];
-//                cardStack[0] = readCardFromFoundations(c1);
-//                if (cardStack[0] == null) {
-//                    cardStack = null;
-//                }
-//                break;
-//            default:
-//                System.out.println("Source column/area not recognised");
-//                cardStack = null;
-//        }
-//        return cardStack;
-//    }
-//
-//    private static Card[] readCardStackFromTableau(int n, int c1) {
-//        int col = c1 - 1;
-//        int row = tableau.length;
-//        do {
-//            row--;
-//        } while (tableau[row][col] == null);
-//        Card[] cardStack = new Card[n];
-//        for (int i = 0; i < n; i--) {
-//            if (row < 0) {
-//                System.out.println("There aren't enough cards in that column");
-//                return null;                
-//            }
-//            if (tableau[row][col] != null) {
-//                Card card = tableau[row][col];
-//                if (card.getHidden()) {
-//                    System.out.println("There aren't enough visible cards in that column");
-//                    return null;
-//                }
-//                cardStack[i] = card;
-//                tableau[row][col] = null;
-//                row--;
-//            }
-//        }
-//        return cardStack;
-//    }
-//    
-//    private static Card readCardFromWaste() {
-//        if (wasteCounter == 0) {
-//            System.out.println("The waste is empty");
-//            return null;
-//        }
-//        wasteCounter--;
-//        Card tempCard = waste[wasteCounter];
-//        waste[wasteCounter] = null;
-//        return tempCard;
-//    }
-//    
-//    private static Card readCardFromFoundations(int c1) {
-//        int index = c1 - 9;
-//        if (foundationsCounter[index] == 0) {
-//            System.out.println("This foundation is empty");
-//            return null;
-//        }
-//        foundationsCounter[index]--;
-//        Card tempCard = foundations[foundationsCounter[index]][index];
-//        foundations[foundationsCounter[index]][index] = null;
-//        return tempCard;
-//    }
-//    
-//    private static void writeCardStack(Card[] cardStack, int c2) {
-//        switch (c2) {
-//            case 1:
-//            case 2:
-//            case 3:
-//            case 4:
-//            case 5:
-//            case 6:
-//            case 7:
-//                writeCardStackToTableau(cardStack, c2);
-//                break;
-//            case 8:
-//                System.out.println("You cannot place a card in the waste"); 
-//                break;
-//            case 9:
-//            case 10:
-//            case 11:
-//            case 12:
-//                writeCardToFoundation(cardStack[0], c2);
-//                break;
-//            default:
-//                System.out.println("Destination column/area not recognised");
-//        }       
-//    }
-//    
-//    private static void writeCardStackToTableau(Card[] cardStack, int c2) {
-//        int col = c2 - 1;
-//        int row = tableau.length;
-//        do {
-//            row--;
-//        } while (tableau[row][col] == null);
-//        if (isValidT(tableau[row][col], cardStack[0])) {
-//            for (int i = 0; i < cardStack.length; i++) {
-//                tableau[row + 1][col] = cardStack[i];
-//            }
-//            return;
-//        }
-//        System.out.println("That is not a valid move");
-//    }
-//    
-//    private static void writeCardToFoundation(Card card, int c2) {
-//        int index = c2 -9;
-//        for(int i = 0; i < 4; i++) {
-//            if (isValidF(foundations[foundationsCounter[index] - 1][index], card)) {
-//                foundations[foundationsCounter[index]][index] = card;
-//                foundationsCounter[index]++;
-//                return;
-//            }
-//        }
-//        System.out.println("That is not a valid move");
-//    }
-//    
-//    private static boolean isValidT(Card card1, Card card2) {
-//        return !card1.getColour().equals(card1.getColour()) && card1.getValue().equals(values[getIndex(card2.getValue()) + 1]);
-//    }
-//
-//    private static boolean isValidF(Card card1, Card card2) {
-//        return card1.getSuit().equals(card1.getSuit()) && card1.getValue().equals(values[getIndex(card2.getValue()) - 1]);
-//    }
-//    
-//    private static int getIndex(String value) {
-//        for (int i = 0; i < 13; i++) {
-//            if (values[i].equals(value)) {
-//                return i;
-//            }
-//        }
-//        System.out.println("ERROR: getIndex was unable to find the index of the specified String");
-//        return -1;
-//    }
-//    
+    
+    private static void moveCardStack(int source, int n, int dest) {
+        ArrayList<Card> cardStack;
+        //Read the card stack
+        cardStack = readCardStack(source, n);
+        
+        //Was the card stack read successfully?
+        if (cardStack != null) {
+            boolean writeFail = writeCardStack(cardStack, dest);
+            //If writing failed write the card stack back to the source
+            if (writeFail) {
+                writeCardStack(cardStack, source);
+            }
+        }
+    }
+
+    private static ArrayList<Card> readCardStack(int source, int n) {
+        //Check that n is valid
+        if (n < 1 || n > 13) {
+            System.out.println("That value for n is invalid");
+            return null;
+        }
+        
+        ArrayList<Card> cardStack = new ArrayList<>();
+        switch (source) {
+            case 1:
+            case 2:
+            case 3:
+            case 4:
+            case 5:
+            case 6:
+            case 7:
+                cardStack = readCardStackFromTableau(source, n);
+                break;
+            case 8:
+                cardStack = readCardStackFromWaste();
+                break;
+            case 9:
+            case 10:
+            case 11:
+            case 12:
+                cardStack = readCardStackFromFoundations(source);
+                break;
+            default:
+                System.out.println("Source column/area not recognised");
+                cardStack = null;
+        }
+        return cardStack;
+    }
+
+    private static ArrayList<Card> readCardStackFromTableau(int source, int n) {
+        int index = source - 1;
+        List<Card> col = tab.get(index);
+        ArrayList<Card> cardStack = new ArrayList<>();
+        for (int i = 0; i < n; i++) {
+            if (col.isEmpty()) {
+                System.out.println("There aren't enough cards in that column");
+                return null;              
+            }
+            if (col.get(col.size() - 1).getHidden()) {
+                System.out.println("There aren't enough visible cards in that column");
+                return null;             
+            }
+            cardStack.add(col.get(col.size() - 1 - i));
+        }
+        tab.get(index).subList(tab.get(index).size() - 1 - n, tab.get(index).size()).clear();
+        return cardStack;
+    }
+    
+    private static ArrayList<Card> readCardStackFromWaste() {
+        if (waste.isEmpty()) {
+            System.out.println("The waste is empty");
+            return null;
+        }
+        ArrayList<Card> cardStack = new ArrayList<>();
+        cardStack.add(waste.remove(waste.size() - 1));
+        return cardStack;
+    }
+    
+    private static ArrayList<Card> readCardStackFromFoundations(int source) {
+        int index = source - 9;
+        List<Card> col = found.get(index);
+        if (col.isEmpty()) {
+            System.out.println("This foundation is empty");
+            return null;
+        }
+        ArrayList<Card> cardStack = new ArrayList<>();
+        cardStack.add(col.get(col.size() - 1));
+        found.get(index).remove(found.get(index).size() - 1);
+        return cardStack;
+    }
+    
+    private static boolean writeCardStack(ArrayList<Card> cardStack, int dest) {
+        boolean writeFail;
+        switch (dest) {
+            case 1:
+            case 2:
+            case 3:
+            case 4:
+            case 5:
+            case 6:
+            case 7:
+                writeFail = writeCardStackToTableau(cardStack, dest);
+                break;
+            case 8:
+                System.out.println("You cannot place a card in the waste"); 
+                writeFail = true;
+                break;
+            case 9:
+            case 10:
+            case 11:
+            case 12:
+                writeFail = writeCardStackToFoundation(cardStack, dest);
+                break;
+            default:
+                System.out.println("Destination column/area not recognised");
+                writeFail = true;
+        }       
+        return writeFail;
+    }
+    
+    private static boolean writeCardStackToTableau(ArrayList<Card> cardStack, int dest) {
+        int index = dest - 1;
+        List<Card> col = tab.get(index);
+        if (isValidForTableau(col.get(col.size() - 1), cardStack.get(cardStack.size() - 1))) {
+            Collections.reverse(cardStack);
+            tab.get(index).addAll(cardStack);
+            return false;
+        }
+        System.out.println("That is not a valid movement");
+        return true;
+    }
+    
+    private static boolean writeCardStackToFoundation(ArrayList<Card> cardStack, int dest) {
+        int index = dest - 9;
+        List<Card> col = found.get(index);
+        if (isValidForFoundations(col.get(col.size() - 1), cardStack.get(cardStack.size() - 1))) {
+            Collections.reverse(cardStack);
+            found.get(index).addAll(cardStack);
+            return false;
+        }
+        System.out.println("That is not a valid movement");
+        return true;
+    }
+    
+    private static boolean isValidForTableau(Card placed, Card placee) {
+        return !placed.getColour().equals(placee.getColour()) && values[Arrays.binarySearch(values, placed.getValue()) - 1].equals(placee.getValue());
+    }
+    
+    private static boolean isValidForFoundations(Card placed, Card placee) {
+        return placed.getSuit().equals(placee.getSuit()) && values[Arrays.binarySearch(values, placed.getValue()) + 1].equals(placee.getValue());
+    }
 }

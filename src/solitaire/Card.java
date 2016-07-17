@@ -57,12 +57,6 @@ public class Card {
         switch (value) {
             case "ace":
                 return 'A';
-            case "jack":
-                return 'J';
-            case "queen":
-                return 'Q';
-            case "king":
-                return 'K';
             case "2":
             case "3":
             case "4":
@@ -71,8 +65,15 @@ public class Card {
             case "7":
             case "8":
             case "9":
-            case "10":
                 return value.charAt(0);
+            case "10":
+                return 'T';
+            case "jack":
+                return 'J';
+            case "queen":
+                return 'Q';
+            case "king":
+                return 'K';                
             default:
                 System.out.println("ERROR: Value not recognised");                  
                 return '?';            
