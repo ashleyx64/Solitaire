@@ -25,14 +25,18 @@ public class Solitaire {
                                     waste = new Stack<>();
     private static final Stack<Stack<Card>>  tab = new Stack<>(),
                                             found = new Stack<>();
+    private static boolean  exitGameLoop = false,
+                            gameWon = false,
+                            gameLost = false,
+                            restart;
     
     /**
      * @param args the command line arguments
      */
-    public static void main(String[] args) {
-        tab.setSize(7);
-        found.setSize(4);
-        
+    public static void main(String[] args) {    
+        do {
+        restart = false;
+            
         fillPack();
         printPack();
         
@@ -41,7 +45,8 @@ public class Solitaire {
         
         layTable();
         
-        do {
+        //Run main game loop        
+        while (true) {
             
             printTable();
             
@@ -50,10 +55,13 @@ public class Solitaire {
             System.out.println("- Enter 'turn' to turn over the hand");
             System.out.println("- Enter 'move #1 #2 #3' where #1 refers to the column/area you wish to move cards from, #2 refers to the number of cards you wish to move and #3 refers to the column/area you want to move them to");
             System.out.println("(Use 8 to refer to the waste and 9 through 12 to refer to the foundations)");
+            System.out.println("- Type 'exit' to exit");
+            System.out.println("- Type 'restart' to start a new game");
             
-            boolean inputRecognised, moveFail = false;            
+            boolean inputRecognised, moveFail;            
             do {
                 inputRecognised = true;
+                moveFail = false;
                 String[] input = sc.nextLine().split(" ");
                 switch (input[0]) {
                     case "turn":
@@ -72,14 +80,35 @@ public class Solitaire {
                             moveFail = moveCardStack(inputNum[0], inputNum[1], inputNum[2]);
                         }
                         break;
+                    case "exit":
+                        exitGameLoop = true;
+                    case "restart":
+                        restart = true;
+                        exitGameLoop = true;
                     default:
                         System.out.println("I don't recognise what you've entered");
                         inputRecognised = false;
                 }
             } while (!inputRecognised || moveFail);
             
+            checkGameWon();
+            checkGameLost();
             
-        } while (!gameWon());
+            if (exitGameLoop) {
+                break;
+            }
+        }
+        
+        if (gameWon) {
+            System.out.println("You win, congratulations!");
+        } else if (gameLost) {
+            System.out.println("There are no more available moves.");
+        } else if (restart) {
+            System.out.println("Restarting game");
+        } else {
+            System.out.println("Exiting game");
+        }
+        } while (restart);
     }
 
     private static void printPack() {
@@ -113,7 +142,7 @@ public class Solitaire {
         //Lay out the tableau
         for (int i = 0; i < 7; i++) {
             //Initialise the stack in each column
-            tab.set(i, new Stack<Card>());
+            tab.push(new Stack<Card>());
             for (int j = 0; j < i + 1; j++) {
                 tab.get(i).push(pack[packCounter]);
                 if (j != i) {
@@ -132,7 +161,7 @@ public class Solitaire {
         
         //Initliase the foundations
         for (int i = 0; i < 4; i++) {
-            found.set(i, new Stack<Card>());
+            found.push(new Stack<Card>());
         }
     }
     
@@ -209,11 +238,6 @@ public class Solitaire {
         waste.clear();
     }
     
-    private static boolean gameWon() {
-        //TODO: Code game win condition
-        return false;
-    }
-    
     private static boolean moveCardStack(int source, int n, int dest) {
         Stack<Card> cardStack;
         //Read the card stack
@@ -270,11 +294,11 @@ public class Solitaire {
         }
         Stack<Card> cardStack = new Stack<>();
         for (int i = 0; i < n; i++) {
-            if (tab.get(index).peek().getHidden()) {
+            if (tab.get(index).get(tab.get(index).size() - 1 - i).getHidden()) {
                 System.out.println("There aren't enough visible cards in that column");
                 return null;             
             }
-            cardStack.push(tab.get(index).peek());
+            cardStack.push(tab.get(index).get(tab.get(index).size() - 1 - i));
         }
         return cardStack;
     }
@@ -446,5 +470,19 @@ public class Solitaire {
     private static void removeCardFromFoundations(int loc) {
         int index = loc - 9;
         found.get(index).pop();
-    } 
+    }
+    
+    private static void checkGameWon() {
+        for (int i = 0; i < 4; i++) {
+            if (found.get(i).size() != 13) {
+                return;
+            }
+        }
+        gameWon = true;
+        exitGameLoop = true;
+    }
+
+    private static void checkGameLost() {
+        //TODO: Code game loss condition
+    }
 }
