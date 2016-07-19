@@ -19,22 +19,14 @@ public class Card {
                                 ANSI_RED = "\u001B[31m",
                                 hiddenChar = "##";
     
-    public Card(String consSuit, String consValue, boolean consHidden) {
-        suit = consSuit;
-        value = consValue;
-        hidden = consHidden;
+    public Card(String suit, String value, boolean hidden) {
+        this.suit = suit;
+        this.value = value;
+        this.hidden = hidden;
         
         suitChar = genSuitChar();
         valueChar = genValueChar();
         colour = genColour();
-    }
-    
-    private String genColour() {
-        if (suit.equals("spades") || suit.equals("clubs")) {
-            return "black";
-        } else {
-            return "red";
-        }
     }
 
     private char genSuitChar() {
@@ -77,6 +69,20 @@ public class Card {
             default:
                 System.out.println("ERROR: Value not recognised");                  
                 return '?';            
+        }
+    }
+    
+    private String genColour() {
+        switch (suit) {
+            case "spades":
+            case "clubs":
+                return "black";
+            case "hearts":
+            case "diamonds":
+                return "red";
+            default:
+                System.out.println("ERROR: Suit not recognised");
+                return "?";
         }
     }
     

@@ -46,13 +46,14 @@ public class Solitaire {
             printTable();
             
             //Query the player
-            boolean inputRecognised;
+            System.out.println("Options:");
+            System.out.println("- Enter 'turn' to turn over the hand");
+            System.out.println("- Enter 'move #1 #2 #3' where #1 refers to the column/area you wish to move cards from, #2 refers to the number of cards you wish to move and #3 refers to the column/area you want to move them to");
+            System.out.println("(Use 8 to refer to the waste and 9 through 12 to refer to the foundations)");
+            
+            boolean inputRecognised, moveFail = false;            
             do {
                 inputRecognised = true;
-                System.out.println("Options:");
-                System.out.println("- Enter 'turn' to turn over the hand");
-                System.out.println("- Enter 'move #1 #2 #3' where #1 refers to the column/area you wish to move cards from, #2 refers to the number of cards you wish to move and #3 refers to the column/area you want to move them to");
-                System.out.println("(Use 8 to refer to the waste and 9 through 12 to refer to the foundations)");
                 String[] input = sc.nextLine().split(" ");
                 switch (input[0]) {
                     case "turn":
@@ -67,14 +68,15 @@ public class Solitaire {
                             for (int i = 0; i < 3; i++) {
                                 inputNum[i] = Integer.parseInt(input[i + 1]);
                             }
-                            moveCardStack(inputNum[0], inputNum[1], inputNum[2]);
+//                            System.out.println(Arrays.toString(inputNum));
+                            moveFail = moveCardStack(inputNum[0], inputNum[1], inputNum[2]);
                         }
                         break;
                     default:
                         System.out.println("I don't recognise what you've entered");
                         inputRecognised = false;
                 }
-            } while (!inputRecognised);
+            } while (!inputRecognised || moveFail);
             
             
         } while (!gameWon());
@@ -212,7 +214,7 @@ public class Solitaire {
         return false;
     }
     
-    private static void moveCardStack(int source, int n, int dest) {
+    private static boolean moveCardStack(int source, int n, int dest) {
         Stack<Card> cardStack;
         //Read the card stack
         cardStack = readCardStack(source, n);
@@ -222,12 +224,13 @@ public class Solitaire {
             //Attempt to write the card stack
             boolean writeFail = writeCardStack(cardStack, dest);
             //If writing failed write the card stack back to the source
-            if (writeFail) {
-                writeCardStack(cardStack, source);
-            } else {
+            if (!writeFail) {
+                removeCardStack(source, n);
                 revealCard(source);
+                return false;
             }
         }
+        return true;
     }
 
     private static Stack<Card> readCardStack(int loc, int n) {
@@ -271,9 +274,8 @@ public class Solitaire {
                 System.out.println("There aren't enough visible cards in that column");
                 return null;             
             }
-            cardStack.push(tab.get(index).pop());
+            cardStack.push(tab.get(index).peek());
         }
-        tab.get(index).removeAll(tab.get(index));
         return cardStack;
     }
     
@@ -283,7 +285,7 @@ public class Solitaire {
             return null;
         }
         Stack<Card> cardStack = new Stack<>();
-        cardStack.push(waste.pop());
+        cardStack.push(waste.peek());
         return cardStack;
     }
     
@@ -294,12 +296,11 @@ public class Solitaire {
             return null;
         }
         Stack<Card> cardStack = new Stack<>();
-        cardStack.push(found.get(index).pop());
+        cardStack.push(found.get(index).peek());
         return cardStack;
     }
     
     private static boolean writeCardStack(Stack<Card> cardStack, int loc) {
-        boolean writeFail;
         switch (loc) {
             case 1:
             case 2:
@@ -308,23 +309,19 @@ public class Solitaire {
             case 5:
             case 6:
             case 7:
-                writeFail = writeCardStackToTableau(cardStack, loc);
-                break;
+                return writeCardStackToTableau(cardStack, loc);
             case 8:
                 System.out.println("You cannot place a card in the waste"); 
-                writeFail = true;
-                break;
+                return true;
             case 9:
             case 10:
             case 11:
             case 12:
-                writeFail = writeCardStackToFoundation(cardStack, loc);
-                break;
+                return writeCardStackToFoundation(cardStack, loc);
             default:
                 System.out.println("Destination column/area not recognised");
-                writeFail = true;
-        }       
-        return writeFail;
+                return true;
+        }
     }
     
     private static boolean writeCardStackToTableau(Stack<Card> cardStack, int loc) {
@@ -335,7 +332,6 @@ public class Solitaire {
             }
             return false;
         }
-        System.out.println("That is not a valid movement");
         return true;
     }
     
@@ -347,38 +343,108 @@ public class Solitaire {
             }
             return false;
         }
-        System.out.println("That is not a valid movement");
         return true;
     }
     
     private static boolean isValidForTableau(Card placee, int index) {
         if (tab.get(index).empty()) {
-            return placee.getValue().equals("king");
+            if (placee.getValue().equals("king")) {
+                return true;
+            }
+            System.out.println("Only kings can be placed in empty columns");
+            return false;
         }
-        Card placed = tab.get(index).peek();            
-        int valIndex = Arrays.binarySearch(values, placed.getValue()) - 1;
+        Card placed = tab.get(index).peek();
+//        System.out.println("placed.getValue() = " + placed.getValue());
+        int valIndex = Arrays.asList(values).indexOf(placed.getValue()) - 1;
+//        System.out.println("valIndex = " + valIndex);
         if (valIndex >= 0 && valIndex < 13) {
-            return !placed.getColour().equals(placee.getColour()) && values[valIndex].equals(placee.getValue());
+            if (!placed.getColour().equals(placee.getColour())) {
+                if (values[valIndex].equals(placee.getValue())) {
+                    return true;
+                }
+                System.out.println("Cards can only be stacked sequentially");
+                return false;
+            }
+            System.out.println("Only cards of differing colour may be stacked on the tableau");
+            return false;
         }
+        System.out.println("That is not a valid movement");
         return false;
     }
     
     private static boolean isValidForFoundations(Card placee, int index) {
         if (found.get(index).empty()) {
-            return placee.getValue().equals("ace");
+            if (placee.getValue().equals("ace")) {
+                return true;
+            }
+            System.out.println("Only aces can be placed in empty foundations");
+            return false;
         }
         Card placed = found.get(index).peek();
-        int valIndex = Arrays.binarySearch(values, placed.getValue()) + 1;
+        int valIndex = Arrays.asList(values).indexOf(placed.getValue()) + 1;
         if (valIndex >= 0 && valIndex < 13) {
-            return !placed.getColour().equals(placee.getColour()) && values[valIndex].equals(placee.getValue());
+            if (placed.getSuit().equals(placee.getSuit())) {
+                if (values[valIndex].equals(placee.getValue())) {
+                    return true;
+                }
+                System.out.println("Cards can only be stacked sequentially");
+                return false;
+            }
+            System.out.println("Only cards of the same suit may be stacked on the foundations");
+            return false;
         }
+        System.out.println("That is not a valid movement");
         return false;
     }
     
     private static void revealCard(int loc) {
         if (loc >= 1 && loc <= 7) {
             int index = loc - 1;
-            tab.get(index).peek().setHidden(false);
+            if (!tab.get(index).empty()) {
+                tab.get(index).peek().setHidden(false);
+            }
         }
     }
+    
+    private static void removeCardStack(int loc, int n) {
+        switch (loc) {
+            case 1:
+            case 2:
+            case 3:
+            case 4:
+            case 5:
+            case 6:
+            case 7:
+                removeCardStackFromTableau(loc, n);
+                break;
+            case 8:
+                removeCardFromWaste();
+                break;
+            case 9:
+            case 10:
+            case 11:
+            case 12:
+                removeCardFromFoundations(loc);
+                break;
+            default:
+                System.out.println("ERROR: Location to remove card stack from not recognised");
+        }
+    }
+    
+    private static void removeCardStackFromTableau(int loc, int n) {
+        int index = loc - 1;
+        for (int i = 0; i < n; i++) {
+            tab.get(index).pop();
+        }
+    }
+    
+    private static void removeCardFromWaste() {
+        waste.pop();
+    }
+    
+    private static void removeCardFromFoundations(int loc) {
+        int index = loc - 9;
+        found.get(index).pop();
+    } 
 }
