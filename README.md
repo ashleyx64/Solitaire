@@ -3,6 +3,6 @@
 <p>Written in Java, uses Stacks to manage the processing of cards and STDIN/OUT to process user input and to print the game table.</p>
 <p><b>TODO:</b></p>
 <ul>
-  <li>Fix bugs</li>
-  <li>Add game win condition</li>
+  <li>Add game loss condition</li>
+  <li>Add move prediction?</li>
 </ul>
